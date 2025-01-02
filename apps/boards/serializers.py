@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from apps.authentication.serializers import UserPublicSerializer
 from apps.boards.models import Board, Group, Tile
 
 
@@ -19,6 +20,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
 class BoardSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True)
+    created_by = UserPublicSerializer(many=False)
 
     class Meta:
         model = Board

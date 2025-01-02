@@ -41,9 +41,11 @@ INSTALLED_APPS = [
     "rest_framework",
     "apps.authentication",
     "apps.boards",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -132,3 +134,8 @@ STATIC_ROOT = "/static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "authentication.User"
+
+CORS_ORIGIN_WHITELIST = os.environ.get(
+    "CORS_ORIGIN_WHITELIST",
+    "http://localhost:3000,http://localhost:3001,http://localhost:5173",
+).split(",")

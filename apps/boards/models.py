@@ -7,6 +7,7 @@ class Board(models.Model):
     created_by = models.ForeignKey(
         User, null=True, on_delete=models.SET_NULL, related_name="boards"
     )
+    created_at = models.DateTimeField(auto_now_add=True)
     name = models.CharField(null=False, default="", blank=False, max_length=255)
 
 

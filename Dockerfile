@@ -14,7 +14,7 @@ ENV EMAIL_HOST_USER ""
 ENV EMAIL_HOST_PASSWORD ""
 ENV EMAIL_REDIRECT_ADDRESS ""
 ENV MAILCHIMP_AUTH_TOKEN ""
-ENV CORS_ORIGIN_WHITELIST "http://localhost:3000,http://localhost:3001"
+ENV CORS_ORIGIN_WHITELIST "http://localhost:3000,http://localhost:3001,http://localhost:5173"
 
 WORKDIR /code
 
