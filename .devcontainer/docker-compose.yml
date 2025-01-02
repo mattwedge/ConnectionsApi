@@ -1,0 +1,81 @@
+version: "3.3"
+
+networks:
+  dev:
+
+volumes:
+  mysqldata:
+    driver: local
+  
+services:
+  dev-container:
+    image: 'connectionsapi_devcontainer_dev-container'  
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    env_file: .env.local
+    volumes:
+      - ~/.gitconfig:/root/.gitconfig
+      - ..:/workspace
+    command: sleep infinity
+    networks:
+      - dev
+
+  mysql:
+    # This version of the image is needed if working on arm64 chip architecture, such as M1 Macs:
+    # platform: linux/x86_64
+    image: mariadb:10.5
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: 'connectionsdev'
+      MYSQL_USER: 'wedge'
+      MYSQL_PASSWORD: 'q'
+      MYSQL_ROOT_PASSWORD: 'q'
+    volumes:
+      - mysqldata:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d
+      
+    networks:
+      - dev
+
+  stripe:
+    image: stripe/stripe-cli
+    environment:
+      STRIPE_API_KEY: 'sk_test_51KOgdNKRGF8stJBTKhoHL1jePIc4ttMCN8YDZVzFmdxbsIXcnAk3zIhYPKbuGbiHkwJ5jzPaOb55UWJkh2rP1MLh00JdqZQ3Zq'
+    networks:
+      - dev
+    command: listen --forward-to http://host.docker.internal:8000/orders/create/webhook/
+
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - AWS_DEFAULT_REGION=eu-west-2
+      - EDGE_PORT=4566
+      - SERVICES=s3
+    ports:
+      - '4566-4583:4566-4583'
+    volumes:
+      # - "${TEMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - ./localstack:/etc/localstack
+    networks:
+      - dev
+
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        - DJANGO_SECRET_KEY=django-insecure-3*)ft%v)2av(bn7wytv=*0u$r8$y&$te8x*uo+tsuoe@#yr6xn
+    ports:
+      - 8000:8000
+    env_file: .env.local
+    volumes:
+      - ..:/code
+    networks:
+      - dev
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - mysql
+      - stripe
+      - localstack
