@@ -39,28 +39,6 @@ services:
     networks:
       - dev
 
-  stripe:
-    image: stripe/stripe-cli
-    environment:
-      STRIPE_API_KEY: 'sk_test_51KOgdNKRGF8stJBTKhoHL1jePIc4ttMCN8YDZVzFmdxbsIXcnAk3zIhYPKbuGbiHkwJ5jzPaOb55UWJkh2rP1MLh00JdqZQ3Zq'
-    networks:
-      - dev
-    command: listen --forward-to http://host.docker.internal:8000/orders/create/webhook/
-
-  localstack:
-    image: localstack/localstack:latest
-    environment:
-      - AWS_DEFAULT_REGION=eu-west-2
-      - EDGE_PORT=4566
-      - SERVICES=s3
-    ports:
-      - '4566-4583:4566-4583'
-    volumes:
-      # - "${TEMPDIR:-/tmp/localstack}:/tmp/localstack"
-      - ./localstack:/etc/localstack
-    networks:
-      - dev
-
   api:
     build:
       context: ..
@@ -77,5 +55,3 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       - mysql
-      - stripe
-      - localstack
